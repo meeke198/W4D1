@@ -28,7 +28,7 @@ class KnightPathFinder
     @starting_position = position
     @considered_positions = [@starting_position]
     self.build_move_tree
-    @root_node = 
+    # @root_node =
   end
 
   # we can use __.current_root_node.children[0] to see "moves" of first child
@@ -65,7 +65,7 @@ class KnightPathFinder
       current_node = queue.shift
 
       new_move_positions(current_node.value).each do |pos|
-        # debugger
+
         new_child = PolyTreeNode.new(pos)
         current_node.add_child(new_child)
         queue << new_child
@@ -77,31 +77,36 @@ class KnightPathFinder
 
   def find_path(end_pos)
     # search for the end pos recursively using dfs
-    path = []
-    return self if self.value == end_pos
-    self.current_root_node.children.each do |child|
-      result = child.dfs(end_pos)
-      unless result.nil?
-        path << result
-      end
-    end
-    path.nil? nil : path
+
+    leaf_node = current_root_node.bfs(end_pos)
+    self.trace_path_back(leaf_node)
   end
-def trace_path_back(end_pos)
-  trace_path = []
-  # start with a node add node.value to the arr
-  # look to see if node has parent
-  # if parent found, curent node == parent
-  # add node.value to arr
-  # continue until node doesnt has parent
-  # arr.reverse it
+
+  def trace_path_back(leaf_node)
+    # start with a node add node.value to the arr
+
+    path = [leaf_node.value]
+    current_node = leaf_node
+    # look to see if node has parent
+    until current_node.parent.nil?
+      # if parent found, curent node == parent
+      # add node.value to arr
+      # continue until node doesnt has parent
+      current_node = current_node.parent
+      path << current_node.value
+    end
+    # arr.reverse it
+    path.reverse
+  end
+
 end
 
-
-end
-
-k = KnightPathFinder.new([4, 4])
+# k = KnightPathFinder.new([4, 4])
 # p k.inspect
 
 # kpf.find_path([2, 1]) # => [[0, 0], [2, 1]]
 # kpf.find_path([3, 3]) # => [[0, 0], [2, 1], [3, 3]]
+
+kpf = KnightPathFinder.new([0, 0])
+p kpf.find_path([7, 6]) # => [[0, 0], [1, 2], [2, 4], [3, 6], [5, 5], [7, 6]]
+p kpf.find_path([6, 2]) # => [[0, 0], [1, 2], [2, 0], [4, 1], [6, 2]]
