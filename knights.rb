@@ -28,6 +28,7 @@ class KnightPathFinder
     @starting_position = position
     @considered_positions = [@starting_position]
     self.build_move_tree
+    @root_node = 
   end
 
   # we can use __.current_root_node.children[0] to see "moves" of first child
@@ -74,10 +75,28 @@ class KnightPathFinder
     # has BFS behavior but does not search for a target
   end
 
-  def path_find(position)
+  def find_path(end_pos)
     # search for the end pos recursively using dfs
-
+    path = []
+    return self if self.value == end_pos
+    self.current_root_node.children.each do |child|
+      result = child.dfs(end_pos)
+      unless result.nil?
+        path << result
+      end
+    end
+    path.nil? nil : path
   end
+def trace_path_back(end_pos)
+  trace_path = []
+  # start with a node add node.value to the arr
+  # look to see if node has parent
+  # if parent found, curent node == parent
+  # add node.value to arr
+  # continue until node doesnt has parent
+  # arr.reverse it
+end
+
 
 end
 
