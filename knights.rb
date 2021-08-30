@@ -1,4 +1,5 @@
 require_relative 'polytree'
+require 'byebug'
 
 # Learning Goals:
   # Implement your PolyTreeNode to build a path from start to finish
@@ -11,7 +12,7 @@ require_relative 'polytree'
 class KnightPathFinder
   POSITIONS = [[-2, 1],[-2, -1], [1, 2], [1, -2], [2, 1], [2, -1], [-1, -2], [-1, 2]]
   def self.valid_moves(pos)
-      valid_moves = []
+    valid_moves = []
     POSITIONS.each do |pos_move|
       new_pos = [pos_move[0] + pos[0], pos_move[1] + pos[1]]
       if (new_pos[0] >= 0 && new_pos[0] < 8) && (new_pos[1] >= 0 && new_pos[1] < 8)
@@ -21,24 +22,26 @@ class KnightPathFinder
     valid_moves
   end
 
-
-  attr_reader :starting_position
+  attr_accessor :starting_position, :current_root_node
 
   def initialize(position)
     @starting_position = position
-    @considered_positions = [starting_position]
+    @considered_positions = [@starting_position]
     self.build_move_tree
   end
 
-  def path_find(position)
-    # search for the end pos recursively using dfs
-
+  # we can use __.current_root_node.children[0] to see "moves" of first child
+  def inspect
+    { current_root_node: current_root_node }.inspect
   end
 
   def new_move_positions(new_pos)
-    KnightPathFinder.valid_moves(new_pos)
-
-    return @considered_positions
+    all_moves = KnightPathFinder.valid_moves(new_pos)
+    # check to see if those moves have been in @considered_positions
+    # filtered array must only contain "unique" moves
+    new_moves = all_moves.reject { |move| @considered_positions.include?(move) }
+    @considered_positions.concat(new_moves)
+    return new_moves
   end
 
   # build a move tree
@@ -49,12 +52,37 @@ class KnightPathFinder
   # position directly to the child position
 
   def build_move_tree
-    # start with self.root_node
-    @root_node = PolyTreeNode.new(position)
+    # start with new self.root_node
+    # implement BFS using a queue to search nodes
+    # incorporate new_move_positions
+    self.current_root_node = PolyTreeNode.new(@starting_position)
+    queue = [current_root_node]
+    # need first first ele in queue
+    # add current root node in queue
+
+    until queue.empty?
+      current_node = queue.shift
+
+      new_move_positions(current_node.value).each do |pos|
+        # debugger
+        new_child = PolyTreeNode.new(pos)
+        current_node.add_child(new_child)
+        queue << new_child
+      end
+    end
+    # does not need to return any values
+    # has BFS behavior but does not search for a target
+  end
+
+  def path_find(position)
+    # search for the end pos recursively using dfs
+
   end
 
 end
 
-p KnightPathFinder.valid_moves([0, 0])
+k = KnightPathFinder.new([4, 4])
+# p k.inspect
+
 # kpf.find_path([2, 1]) # => [[0, 0], [2, 1]]
 # kpf.find_path([3, 3]) # => [[0, 0], [2, 1], [3, 3]]

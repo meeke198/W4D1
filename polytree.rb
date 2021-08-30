@@ -71,14 +71,13 @@ class PolyTreeNode
   def bfs(target_value)
     arr = [self]
     until arr.empty?
-      current_node = arr[0]
+      current_node = arr.shift
       if current_node.value == target_value
         return current_node
       end
       if !current_node.children.empty?
         arr.concat(current_node.children)
       end
-      arr.shift
     end
     return nil
   end
